@@ -1,0 +1,401 @@
+name: 🚀 SERVIDOR AI STV PREMIUM
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: '🕐 Tempo de uso'
+        required: false
+        default: '5h40m'
+        type: choice
+        options:
+        - '1h'
+        - '3h'
+        - '5h40m'
+
+jobs:
+  Premium-RDP-Setup:
+    runs-on: windows-latest
+    timeout-minutes: 340
+    
+    steps:
+
+      # BANNER DE BOAS-VINDAS
+      - name: 🎯 INICIANDO SISTEMA
+        run: |
+          Write-Host ""
+          Write-Host ""
+          Write-Host "🤖 SERVIDOR RDP AI STV PREMIUM" -ForegroundColor Yellow
+          Write-Host "⚡ Desenvolvido por AI STV" -ForegroundColor Green
+          Write-Host "🕒 Tempo: ${{ github.event.inputs.duration }}" -ForegroundColor Magenta
+          Write-Host ""
+          
+          $frames = @('⣾','⣽','⣻','⢿','⡿','⣟','⣯','⣷')
+          for($i=0;$i -lt 10;$i++){
+              Write-Host "`r🚀 Inicializando sistema... $($frames[$i % 8])" -NoNewline -ForegroundColor Blue
+              Start-Sleep -Milliseconds 100
+          }
+          Write-Host "`r✅ Sistema pronto!" -ForegroundColor Green
+      # CONFIGURAÇÃO AVANÇADA
+      - name: 🔧 CONFIGURANDO SISTEMA
+        run: |
+          Write-Host ""
+          Write-Host "🛠️ CONFIGURANDO SISTEMA" -ForegroundColor Yellow
+          
+          $steps = @(
+          
+              @{
+              Name="Ativar Área de Trabalho Remota"
+              Script={
+              
+              Set-ItemProperty `
+              -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
+              -Name "fDenyTSConnections" `
+              -Value 0 `
+              -Force
+              
+              Set-ItemProperty `
+              -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
+              -Name "fDenyTSConnections" `
+              -Value 0 `
+              -Force
+              
+              }
+              },
+              
+              
+              @{
+              Name="Desativar autenticação de rede"
+              Script={
+              
+              Set-ItemProperty `
+              -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+              -Name "UserAuthentication" `
+              -Value 0 `
+              -Force
+              
+              }
+              },
+              
+              
+              @{
+              Name="Configurar segurança RDP"
+              Script={
+              
+              Set-ItemProperty `
+              -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+              -Name "SecurityLayer" `
+              -Value 0 `
+              -Force
+              
+              Set-ItemProperty `
+              -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+              -Name "UserAuthentication" `
+              -Value 0 `
+              -Force
+              
+              }
+              },
+              
+              
+              @{
+              Name="Abrir porta firewall 3389"
+              Script={
+              
+              netsh advfirewall firewall add rule `
+              name="RDP-Premium" `
+              dir=in `
+              action=allow `
+              protocol=TCP `
+              localport=3389 `
+              profile=any
+              
+              
+              netsh advfirewall firewall add rule `
+              name="RDP-Premium-Out" `
+              dir=out `
+              action=allow `
+              protocol=TCP `
+              localport=3389 `
+              profile=any
+              
+              }
+              },
+              
+              
+              @{
+              Name="Iniciar serviços"
+              Script={
+              
+              Set-Service `
+              -Name TermService `
+              -StartupType Automatic `
+              -ErrorAction SilentlyContinue
+              
+              
+              Set-Service `
+              -Name UmRdpService `
+              -StartupType Automatic `
+              -ErrorAction SilentlyContinue
+              
+              
+              Start-Service `
+              -Name TermService `
+              -ErrorAction SilentlyContinue
+              
+              
+              Start-Service `
+              -Name UmRdpService `
+              -ErrorAction SilentlyContinue
+              
+              }
+              }
+          
+          )
+          
+          
+          foreach($step in $steps)
+          {
+          
+              Write-Host "│ 📋 $($step.Name)..." -NoNewline
+              
+              try{
+              
+              & $step.Script
+              
+              Write-Host "`r│ ✅ $($step.Name)" -ForegroundColor Green
+              
+              }
+              
+              catch{
+              
+              Write-Host "`r│ ⚠️ $($step.Name)" -ForegroundColor Yellow
+              
+              }
+              
+              Start-Sleep -Milliseconds 500
+          
+          }
+          
+          
+          Write-Host "🎯 Configuração finalizada!" -ForegroundColor Green
+      # CRIAR USUÁRIO PREMIUM
+      - name: 👤 CRIANDO CONTA PREMIUM
+        run: |
+          function New-PremiumPassword {
+          
+              $upper='ABCDEFGHJKLMNPQRSTUVWXYZ'
+              
+              $lower='abcdefghijkmnpqrstuvwxyz'
+              
+              $numbers='23456789'
+              
+              $symbols='!@#$%&*+-='
+              
+              
+              $password=@(
+              
+              ($upper.ToCharArray()|Get-Random -Count 3)-join ''
+              
+              ($lower.ToCharArray()|Get-Random -Count 3)-join ''
+              
+              ($numbers.ToCharArray()|Get-Random -Count 3)-join ''
+              
+              ($symbols.ToCharArray()|Get-Random -Count 3)-join ''
+              
+              )-join ''
+              
+              
+              return -join ($password.ToCharArray()|Sort-Object{Get-Random})
+          
+          }
+          
+          
+          $matKhau=New-PremiumPassword
+          
+          
+          $securePass=ConvertTo-SecureString `
+          $matKhau `
+          -AsPlainText `
+          -Force
+          
+          
+          Remove-LocalUser `
+          -Name "GUSTTA" `
+          -ErrorAction SilentlyContinue
+          
+          
+          New-LocalUser `
+          -Name "GUSTTA" `
+          -Password $securePass `
+          -AccountNeverExpires `
+          -Description "Conta Premium AI STV"
+          
+          
+          Set-LocalUser `
+          -Name "GUSTTA" `
+          -PasswordNeverExpires $true
+          
+          
+          Add-LocalGroupMember `
+          -Group "Administrators" `
+          -Member "GUSTTA" `
+          -ErrorAction SilentlyContinue
+          
+          
+          Add-LocalGroupMember `
+          -Group "Remote Desktop Users" `
+          -Member "GUSTTA" `
+          -ErrorAction SilentlyContinue
+          
+          
+          Add-LocalGroupMember `
+          -Group "Users" `
+          -Member "GUSTTA" `
+          -ErrorAction SilentlyContinue
+          
+          
+          Enable-LocalUser `
+          -Name "GUSTTA"
+          
+          
+          echo "RDP_USER=GUSTTA" >> $env:GITHUB_ENV
+          
+          echo "RDP_PASS=$matKhau" >> $env:GITHUB_ENV
+          
+          
+          echo "$matKhau" > `
+          $env:TEMP\rdp_password.txt
+          
+          
+          Write-Host "Conta criada com sucesso"
+      # TAILSCALE
+      - name: 🌐 CONFIGURANDO REDE
+        env:
+          TAILSCALE_AUTH_KEY: ${{ secrets.TAILSCALE_AUTH_KEY }}
+        run: |
+          Write-Host "Instalando Tailscale"
+          
+          
+          $msiPath="$env:TEMP\tailscale.msi"
+          
+          
+          Invoke-WebRequest `
+          -Uri "https://pkgs.tailscale.com/stable/tailscale-setup-latest-amd64.msi" `
+          -OutFile $msiPath
+          
+          
+          Start-Process `
+          msiexec.exe `
+          -ArgumentList "/i `"$msiPath`" /quiet /norestart" `
+          -Wait
+          
+          
+          Remove-Item `
+          $msiPath `
+          -Force
+          
+          
+          Start-Sleep -Seconds 10
+          
+          
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" up `
+          --authkey=$env:TAILSCALE_AUTH_KEY `
+          --hostname=ai-stv-premium-$env:GITHUB_RUN_ID `
+          --accept-routes `
+          --accept-dns `
+          --reset
+          
+          
+          $ip=& "$env:ProgramFiles\Tailscale\tailscale.exe" ip -4
+          
+          
+          echo "TAILSCALE_IP=$ip" >> $env:GITHUB_ENV
+      # MOSTRAR LOGIN
+      - name: 🎉 INFORMAÇÕES DE CONEXÃO
+        run: |
+          $matKhau=Get-Content `
+          $env:TEMP\rdp_password.txt
+          
+          
+          Write-Host ""
+          
+          Write-Host "================================"
+          
+          Write-Host "RDP PRONTO"
+          
+          Write-Host "================================"
+          
+          Write-Host "IP: $env:TAILSCALE_IP"
+          
+          Write-Host "Usuário: GUSTTA"
+          
+          Write-Host "Senha: $matKhau"
+          
+          Write-Host "Porta: 3389"
+          
+          Write-Host "================================"
+      # MANTER ONLINE
+      - name: ⏳ MANTENDO ONLINE
+        run: |
+          Write-Host ""
+          
+          Write-Host "Servidor ativo..."
+          
+          
+          $start=Get-Date
+          
+          
+          do{
+          
+          $elapsed=(Get-Date)-$start
+          
+          
+          Write-Host "`rTempo ativo: $([int]$elapsed.TotalMinutes) minutos" -NoNewline
+          
+          
+          Start-Sleep -Seconds 5
+          
+          
+          }
+          
+          while($elapsed.TotalMinutes -lt 340)
+      # LIMPEZA
+      - name: 🧹 LIMPEZA
+        if: always()
+        run: |
+          Write-Host "Limpando..."
+          
+          
+          Remove-Item `
+          "$env:TEMP\rdp_password.txt" `
+          -ErrorAction SilentlyContinue
+          
+          
+          Disable-LocalUser `
+          -Name "GUSTTA" `
+          -ErrorAction SilentlyContinue
+          
+          
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" down `
+          --accept-risk=all
+          
+          
+          netsh advfirewall firewall delete rule name="RDP-Premium"
+          
+          
+          netsh advfirewall firewall delete rule name="RDP-Premium-Out"
+          
+          
+          Set-ItemProperty `
+          -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
+          -Name "fDenyTSConnections" `
+          -Value 1
+          
+          
+          Stop-Service `
+          TermService `
+          -Force
+          
+          
+          Write-Host "Limpeza concluída"
